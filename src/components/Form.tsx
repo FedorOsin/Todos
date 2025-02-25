@@ -1,15 +1,28 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { addTodo as addTodoRedux } from "../features/todo/todoSlice";
+import { Todo } from "../types";
 
-import { addTodo } from "../features/todo/todoSlice";
+interface FormProps {
+  useRedux: boolean;
+  onAddTodoReact?: (text: string) => void;
+}
 
-export const Form = () => {
+export const Form: React.FC<FormProps> = ({ useRedux, onAddTodoReact }) => {
   const dispatch = useDispatch();
   const [text, setText] = useState<string>("");
 
-  const handleAddTodo = (e: any) => {
+  const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(addTodo(text));
+    if (text.trim() === "") return;
+
+    if (useRedux) {
+      dispatch(addTodoRedux(text));
+    } else {
+      console.log("onAddTodoReact is called!");
+      onAddTodoReact && onAddTodoReact(text);
+    }
+
     setText("");
   };
 
@@ -39,15 +52,10 @@ export const Form = () => {
         <div className="flex items-center justify-between">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={handleAddTodo}
+            type="submit"
           >
             Добавить
           </button>
-          <a
-            className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-            href="#"
-          ></a>
         </div>
       </form>
     </div>
