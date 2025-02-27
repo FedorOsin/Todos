@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
-import TodoReduxPage from "./pages/TodoReduxPage";
-import TodoReactPage from "./pages/TodoReactPage";
-import TodoDetailsPage from "./pages/TodoDetailsPage";
+import Header from "@components/Header";
+import TodoReduxPage from "@pages/TodoReduxPage";
+import TodoReactPage from "@pages/TodoReactPage";
+import TodoDetailsPage from "@pages/TodoDetailsPage";
 
 function App() {
   return (

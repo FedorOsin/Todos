@@ -25,7 +25,6 @@ export const todoSlice = createSlice({
   initialState,
   reducers: {
     addTodo: (state, action: PayloadAction<string>) => {
-      // console.log("addTodo reducer called", action.payload);
       const todo: Todo = {
         id: nanoid(),
         text: action.payload,

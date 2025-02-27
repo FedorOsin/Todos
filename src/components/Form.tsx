@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addTodo as addTodoRedux } from "../features/todo/todoSlice";
-import { Todo } from "../types";
+import { addTodo as addTodoRedux } from "@features/todo/todoSlice";
+import { Todo } from "@types";
 
 interface FormProps {
   useRedux: boolean;

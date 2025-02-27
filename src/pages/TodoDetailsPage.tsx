@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { RootState } from "../store/Store";
-import { Todo } from "../types";
+import { RootState } from "@store/Store";
+import { Todo } from "@types";
 
 function TodoDetailsPage() {
   const { id } = useParams<{ id: string }>();

@@ -1,6 +1,6 @@
 import React from "react";
-import { Todos } from "../components/Todos";
-import { Form } from "../components/Form";
+import { Todos } from "@components/Todos";
+import { Form } from "@components/Form";
 
 function TodoReduxPage() {
   return (

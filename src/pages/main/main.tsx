@@ -1,5 +1,5 @@
-import { Form } from "../../components/Form";
-import { Todos } from "../../components/Todos";
+import { Form } from "@components/Form";
+import { Todos } from "@components/Todos";
 
 const Main = () => {
   return (

@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Todo } from "../types";
+import { Todo } from "@types";
 import { Link } from "react-router-dom";
 
 interface TodoItemProps {
@@ -28,7 +28,6 @@ const TodoItem: React.FC<TodoItemProps> = memo(
     onHandleUpdate,
     useRedux,
   }) => {
-    console.log(`TodoItem rendered for id: ${todo.id}`);
     return (
       <li className="m-4 flex justify-between items-center mx-10">
         <span className="text-black font-serif font-bold p-4 w-48 border border-black">

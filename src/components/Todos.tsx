@@ -4,10 +4,10 @@ import {
   updateTodo as updateTodoRedux,
   deleteTodo as deleteTodoRedux,
   toggleComplete as toggleCompleteRedux,
-} from "../features/todo/todoSlice";
-import { RootState } from "../store/Store";
-import { Todo } from "../types";
-import TodoItem from "./TodoItem";
+} from "@features/todo/todoSlice";
+import { RootState } from "@store/Store";
+import { Todo } from "@types";
+import TodoItem from "@components/TodoItem";
 
 interface TodosProps {
   useRedux: boolean;

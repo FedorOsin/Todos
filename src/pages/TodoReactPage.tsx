@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Todos } from "../components/Todos";
-import { Form } from "../components/Form";
-import { Todo } from "../types";
+import { Todos } from "@components/Todos";
+import { Form } from "@components/Form";
+import { Todo } from "@types";
 
 function TodoReactPage() {
   const [todos, setTodos] = useState<Todo[]>([
