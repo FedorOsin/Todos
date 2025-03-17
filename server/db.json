@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "text": "Сделать покупку",
+    "completed": false,
+    "description": "Купить продукты для ужина",
+    "priority": "medium"
+  },
+  {
+    "id": "2",
+    "text": "Погулять с собакой",
+    "completed": true,
+    "description": "Выгулять собаку в парке",
+    "priority": "high"
+  }
+]

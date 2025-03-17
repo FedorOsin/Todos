@@ -1,77 +1,92 @@
-import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useCallback } from "react";
+import { useDispatch } from "react-redux";
+import {
+  updateTodo as updateTodoRedux,
+  deleteTodo as deleteTodoRedux,
+  toggleComplete as toggleCompleteRedux,
+} from "@features/todo/todoSlice";
+import {
+  useGetTodosQuery,
+  useUpdateTodoMutation,
+  useDeleteTodoMutation,
+  useToggleCompleteMutation,
+} from "@features/todo/todoApi";
+import { Todo } from "@types";
+import TodoItem from "@components/TodoItem";
 
-import { updateTodo, Todo, deleteTodo } from "../features/todo/todoSlice";
-import { RootState } from "../app/Store";
+interface TodosProps {
+  useRedux: boolean;
+  todos?: Todo[];
+  setTodos?: React.Dispatch<React.SetStateAction<Todo[]>>;
+}
 
-export const Todos = () => {
+export const Todos: React.FC<TodosProps> = ({ useRedux }) => {
   const [updateSectionId, setUpdateSectionId] = useState<string | null>(null);
   const [updatedText, setUpdatedText] = useState<string>("");
 
-  const todos = useSelector((state: RootState) => state.todos);
   const dispatch = useDispatch();
 
-  const handleUpdateTodo = (id: string) => {
+  const { data, isLoading, isError, error } = useGetTodosQuery();
+
+  const [updateTodo] = useUpdateTodoMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
+  const [toggleComplete] = useToggleCompleteMutation();
+
+  const handleUpdateTodo = useCallback((id: string) => {
     setUpdateSectionId(id);
     setUpdatedText("");
-  };
+  }, []);
 
-  const handleUpdate = () => {
+  const handleUpdate = useCallback(() => {
     if (!updateSectionId) return;
-    dispatch(
-      updateTodo({
-        id: updateSectionId,
-        newText: updatedText,
-      })
-    );
+    updateTodo({ id: updateSectionId, text: updatedText });
     setUpdateSectionId(null);
-  };
+  }, [updateSectionId, updatedText, updateTodo]);
+
+  const handleDeleteTodo = useCallback(
+    (id: string) => {
+      deleteTodo(id);
+    },
+    [deleteTodo]
+  );
+
+  const handleToggleComplete = useCallback(
+    (id: string) => {
+      toggleComplete({ id: id, completed: true });
+    },
+    [toggleComplete]
+  );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    console.error("Error fetching todos:", error);
+    return (
+      <div>
+        Error: Failed to load todos. Please check the console for details.
+      </div>
+    );
+  }
 
   return (
     <section>
       <ul className="list-none bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        {todos.map((todo: Todo) => (
-          <li
+        {data?.map((todo: Todo) => (
+          <TodoItem
             key={todo.id}
-            className="m-4 flex justify-between items-center mx-10"
-          >
-            <span className="text-black font-serif font-bold p-4 w-48 border border-black">
-              Заметка: <span className="text-green-500">{todo.text}</span>
-            </span>
-
-            {updateSectionId === todo.id ? (
-              <>
-                <input
-                  type="text"
-                  value={updatedText}
-                  onChange={(e) => setUpdatedText(e.target.value)}
-                  className="p-2 border border-gray-300 rounded"
-                  placeholder="Изменить заметку..."
-                />
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white p-4 rounded"
-                  onClick={handleUpdate}
-                >
-                  Сохранить
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white p-4 rounded"
-                  onClick={() => dispatch(deleteTodo(todo.id))}
-                >
-                  Удалить
-                </button>
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white p-4 rounded"
-                  onClick={() => handleUpdateTodo(todo.id)}
-                >
-                  Изменить
-                </button>
-              </>
-            )}
-          </li>
+            todo={todo}
+            onToggleComplete={handleToggleComplete}
+            onDeleteTodo={handleDeleteTodo}
+            setUpdateSectionId={setUpdateSectionId}
+            onUpdateTodo={handleUpdateTodo}
+            onHandleUpdate={handleUpdate}
+            updateSectionId={updateSectionId}
+            updatedText={updatedText}
+            setUpdatedText={setUpdatedText}
+            useRedux={useRedux}
+          />
         ))}
       </ul>
     </section>
