@@ -1,11 +1,16 @@
 import React, { useState, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   updateTodo as updateTodoRedux,
   deleteTodo as deleteTodoRedux,
   toggleComplete as toggleCompleteRedux,
 } from "@features/todo/todoSlice";
-import { RootState } from "@store/Store";
+import {
+  useGetTodosQuery,
+  useUpdateTodoMutation,
+  useDeleteTodoMutation,
+  useToggleCompleteMutation,
+} from "@features/todo/todoApi";
 import { Todo } from "@types";
 import TodoItem from "@components/TodoItem";
 
@@ -19,8 +24,13 @@ export const Todos: React.FC<TodosProps> = ({ useRedux }) => {
   const [updateSectionId, setUpdateSectionId] = useState<string | null>(null);
   const [updatedText, setUpdatedText] = useState<string>("");
 
-  const todosRedux = useSelector((state: RootState) => state.todo.todos);
   const dispatch = useDispatch();
+
+  const { data, isLoading, isError, error } = useGetTodosQuery();
+
+  const [updateTodo] = useUpdateTodoMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
+  const [toggleComplete] = useToggleCompleteMutation();
 
   const handleUpdateTodo = useCallback((id: string) => {
     setUpdateSectionId(id);
@@ -29,33 +39,41 @@ export const Todos: React.FC<TodosProps> = ({ useRedux }) => {
 
   const handleUpdate = useCallback(() => {
     if (!updateSectionId) return;
-    dispatch(
-      updateTodoRedux({
-        id: updateSectionId,
-        newText: updatedText,
-      })
-    );
+    updateTodo({ id: updateSectionId, text: updatedText });
     setUpdateSectionId(null);
-  }, [dispatch, updateSectionId, updatedText]);
+  }, [updateSectionId, updatedText, updateTodo]);
 
   const handleDeleteTodo = useCallback(
     (id: string) => {
-      dispatch(deleteTodoRedux(id));
+      deleteTodo(id);
     },
-    [dispatch]
+    [deleteTodo]
   );
 
   const handleToggleComplete = useCallback(
     (id: string) => {
-      dispatch(toggleCompleteRedux(id));
+      toggleComplete({ id: id, completed: true });
     },
-    [dispatch]
+    [toggleComplete]
   );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    console.error("Error fetching todos:", error);
+    return (
+      <div>
+        Error: Failed to load todos. Please check the console for details.
+      </div>
+    );
+  }
 
   return (
     <section>
       <ul className="list-none bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        {todosRedux.map((todo: Todo) => (
+        {data?.map((todo: Todo) => (
           <TodoItem
             key={todo.id}
             todo={todo}

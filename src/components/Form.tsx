@@ -1,29 +1,40 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { addTodo as addTodoRedux } from "@features/todo/todoSlice";
+import { useAddTodoMutation } from "@features/todo/todoApi";
 import { Todo } from "@types";
 
 interface FormProps {
-  useRedux: boolean;
-  onAddTodoReact?: (text: string) => void;
+  onAddTodoReact?: (todo: Omit<Todo, "id">) => void;
 }
 
-export const Form: React.FC<FormProps> = ({ useRedux, onAddTodoReact }) => {
-  const dispatch = useDispatch();
+export const Form: React.FC<FormProps> = ({ onAddTodoReact }) => {
   const [text, setText] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
+  const [addTodo] = useAddTodoMutation();
 
-  const handleAddTodo = (e: React.FormEvent) => {
+  const handleAddTodo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (text.trim() === "") return;
 
-    if (useRedux) {
-      dispatch(addTodoRedux(text));
-    } else {
-      console.log("onAddTodoReact is called!");
-      onAddTodoReact && onAddTodoReact(text);
-    }
+    const newTodo = {
+      text,
+      description,
+      priority,
+      completed: false,
+    };
 
+    if (onAddTodoReact) {
+      onAddTodoReact(newTodo);
+    } else {
+      try {
+        await addTodo({ text, description, priority }).unwrap();
+      } catch (error) {
+        console.error("Failed to add todo:", error);
+      }
+    }
     setText("");
+    setDescription("");
+    setPriority("medium");
   };
 
   return (
@@ -35,18 +46,39 @@ export const Form: React.FC<FormProps> = ({ useRedux, onAddTodoReact }) => {
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="username"
+            htmlFor="text"
           >
             Добавь новую заметку
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="AddTodo"
             type="text"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="text"
             value={text}
             placeholder="Написать..."
             onChange={(e) => setText(e.target.value)}
           />
+        </div>
+
+        <div className="mb-4">
+          <label
+            className="block text-gray-700 text-sm font00 text-sm font-bold mb-2"
+            htmlFor="priority"
+          >
+            Приоритет
+          </label>
+          <select
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="priority"
+            value={priority}
+            onChange={(e) =>
+              setPriority(e.target.value as "low" | "medium" | "high")
+            }
+          >
+            <option value="low">Низкий</option>
+            <option value="medium">Средний</option>
+            <option value="high">Высокий</option>
+          </select>
         </div>
 
         <div className="flex items-center justify-between">
